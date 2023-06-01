@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:skitracker/scelta_comprensorio.dart';
+import 'package:skitracker/about_us.dart';
+
+import 'package:skitracker/mappa.dart';
+import 'package:skitracker/navigation_drawer.dart';
 
 void main() {
   runApp(const MyApp());
@@ -31,13 +36,13 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.lightBlue),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'SkiTracker'),
+      home: const MyHomePage(title: 'SkiTracker', subtitle: 'NomeComprensorio'),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+  const MyHomePage({super.key, required this.title, required this.subtitle});
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -49,6 +54,7 @@ class MyHomePage extends StatefulWidget {
   // always marked "final".
 
   final String title;
+  final String subtitle;
 
 
 /*
@@ -82,8 +88,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
   final Color titleColor = Colors.white;
+  var currentPage = DrawerSection.mappa;
 
   int _counter = 0;
 
@@ -106,6 +112,16 @@ class _MyHomePageState extends State<MyHomePage> {
     // The Flutter framework has been optimized to make rerunning build methods
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
+
+    var container;
+    if (currentPage == DrawerSection.cambiaComprensorio) {
+      container = SceltaComprensorio();
+    } else if (currentPage == DrawerSection.informazioni) {
+      container = AboutUs();
+    } else if (currentPage == DrawerSection.mappa) {
+      container = Mappa();
+    }
+
     return Scaffold(
       appBar: AppBar(
 
@@ -117,7 +133,19 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
         //  centerTitle: true,
         backgroundColor: Colors.lightBlue,
-        //  elevation: 0.0,
+        elevation: 0.0,
+
+        bottom: PreferredSize(
+          preferredSize: Size.fromHeight(20.0),
+          child: Text(
+            widget.subtitle ?? '',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 16.0,
+            ),
+          ),
+        ),
+
 
         /*
         // TRY THIS: Try changing the color here to a specific color (to
@@ -130,6 +158,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
          */
       ),
+      body: container,
+      /*
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
         // in the middle of the parent.
@@ -164,6 +194,81 @@ class _MyHomePageState extends State<MyHomePage> {
         tooltip: 'Increment',
         child: const Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
+    */
+      drawer: Drawer(
+        child: SingleChildScrollView(
+          child: Container(
+            child: Column(
+              children: [
+                MyHeaderDrawer(),
+                MyDrawerList(),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
+  Widget MyDrawerList(){
+    return Container(
+      padding: EdgeInsets.only(top: 15,
+      ),
+      child: Column(
+        children: [
+          menuItem(0, "Mappa", Icons.map,
+              currentPage == DrawerSection.mappa ? true : false),
+          menuItem(1, "Cambia Comprensorio", Icons.change_circle,
+              currentPage == DrawerSection.cambiaComprensorio ? true : false),
+          menuItem(2, "Informazioni", Icons.info_outline,
+              currentPage == DrawerSection.informazioni ? true : false),
+        ],
+      ),
+    );
+  }
+
+  Widget menuItem(int id, String title, IconData icon, bool selected){
+    return Material(
+      color : selected ? Colors.lightBlue : Colors.transparent,
+      child: InkWell(
+        onTap: (){
+          Navigator.pop(context);
+          setState(() {
+            switch (id) {
+              case 0: currentPage = DrawerSection.mappa;
+              case 1: currentPage = DrawerSection.cambiaComprensorio;
+              case 2: currentPage = DrawerSection.informazioni;
+            }
+          });
+        },
+        child: Padding(
+          padding: EdgeInsets.all(15.0),
+          child: Row(
+            children: [
+              Expanded(
+                child: Icon(
+                  icon,
+                  size: 20,
+                  color: Colors.black,
+                ),
+              ),
+              Expanded(
+                flex: 3,
+                child: Text(
+                  title,
+                  style: TextStyle(
+                    color: Colors.black, fontSize: 16,),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+enum DrawerSection {
+  mappa,
+  cambiaComprensorio,
+  informazioni,
 }
