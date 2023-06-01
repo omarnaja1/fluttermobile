@@ -56,33 +56,6 @@ class MyHomePage extends StatefulWidget {
   final String title;
   final String subtitle;
 
-
-/*
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(title),
-        centerTitle: true,
-        backgroundColor: Colors.blue,
-        elevation: 0.0,
-        bottom: const PreferredSize(
-          preferredSize: Size.fromHeight(30.0),
-          child: Text(
-            'Nome comprensorio',
-            style: TextStyle(
-              fontSize: 20.0,
-              color: Colors.white,
-            ),
-          ),
-        ),
-      ),
-    );
-   }
- */
-
-
-
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
