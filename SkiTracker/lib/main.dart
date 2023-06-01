@@ -28,10 +28,10 @@ class MyApp extends StatelessWidget {
         //
         // This works for code too, not just values: Most code changes can be
         // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.lightBlue),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(title: 'SkiTracker'),
     );
   }
 }
@@ -50,11 +50,41 @@ class MyHomePage extends StatefulWidget {
 
   final String title;
 
+
+/*
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(title),
+        centerTitle: true,
+        backgroundColor: Colors.blue,
+        elevation: 0.0,
+        bottom: const PreferredSize(
+          preferredSize: Size.fromHeight(30.0),
+          child: Text(
+            'Nome comprensorio',
+            style: TextStyle(
+              fontSize: 20.0,
+              color: Colors.white,
+            ),
+          ),
+        ),
+      ),
+    );
+   }
+ */
+
+
+
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+
+  final Color titleColor = Colors.white;
+
   int _counter = 0;
 
   void _incrementCounter() {
@@ -78,6 +108,18 @@ class _MyHomePageState extends State<MyHomePage> {
     // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
+
+        title: Text(
+          widget.title,
+          style: TextStyle(
+            color: titleColor,
+          ),
+        ),
+        //  centerTitle: true,
+        backgroundColor: Colors.lightBlue,
+        //  elevation: 0.0,
+
+        /*
         // TRY THIS: Try changing the color here to a specific color (to
         // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
         // change color while the other colors stay the same.
@@ -85,6 +127,8 @@ class _MyHomePageState extends State<MyHomePage> {
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
+
+         */
       ),
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
