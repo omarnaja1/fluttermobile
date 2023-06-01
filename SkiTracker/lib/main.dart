@@ -63,6 +63,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   final Color titleColor = Colors.white;
   var currentPage = DrawerSection.mappa;
+  int _currentIndex = 0;
 
   int _counter = 0;
 
@@ -168,6 +169,8 @@ class _MyHomePageState extends State<MyHomePage> {
         child: const Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     */
+
+
       drawer: Drawer(
         child: SingleChildScrollView(
           child: Container(
@@ -180,6 +183,35 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ),
       ),
+
+      //Bottom Navigation Bar
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Colors.grey,
+        currentIndex: _currentIndex,
+        items: [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.map),
+            label: "Mappa",
+            backgroundColor: Colors.lightBlue,
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.info_sharp),
+            label: "Info comprensorio",
+            backgroundColor: Colors.lightBlue,
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.history),
+            label: "Cronologia",
+            backgroundColor: Colors.lightBlue,
+          ),
+        ],
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+      ),
+
     );
   }
   Widget MyDrawerList(){
