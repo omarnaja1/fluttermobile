@@ -1,11 +1,6 @@
 import 'package:flutter/material.dart';
-
-
-import 'package:skitracker/about_us.dart';
-
-import 'package:skitracker/mappa.dart';
-import 'package:skitracker/navigation_drawer.dart';
-
+import 'package:SkiTracker/about_us.dart';
+import 'package:SkiTracker/mappa.dart';
 import 'info_piste.dart';
 
 void main() {
@@ -19,7 +14,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'SkiTracker',
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -39,7 +34,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.lightBlue),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'SkiTracker', subtitle: 'NomeComprensorio'),
+      home: const MyHomePage(title: 'SkiTracker', subtitle: 'Comprensorio: <nome_comprensorio>'),
     );
   }
 }
@@ -177,7 +172,7 @@ class _MyHomePageState extends State<MyHomePage> {
             backgroundColor: Colors.lightBlue,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.info_sharp),
+            icon: Icon(Icons.downhill_skiing),
             label: "Info comprensorio",
             backgroundColor: Colors.lightBlue,
           ),

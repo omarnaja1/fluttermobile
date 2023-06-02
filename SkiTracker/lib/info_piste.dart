@@ -1,5 +1,5 @@
+import 'package:SkiTracker/scelta_comprensorio.dart';
 import 'package:flutter/material.dart';
-import 'package:skitracker/scelta_comprensorio.dart';
 
 class InfoPiste extends StatefulWidget{
   const InfoPiste({super.key});
@@ -35,7 +35,7 @@ class _InfoPisteState extends State<InfoPiste> {
               MaterialPageRoute(builder: (context) => SceltaComprensorio()),
             );
           },
-          child: const Icon(Icons.change_circle),
+          child: const Icon(Icons.change_circle, color: Colors.white),
         ),
 
     );
