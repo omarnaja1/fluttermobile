@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:skitracker/scelta_comprensorio.dart';
+
+
 import 'package:skitracker/about_us.dart';
 
 import 'package:skitracker/mappa.dart';
@@ -70,7 +71,6 @@ class _MyHomePageState extends State<MyHomePage> {
   final screens = [
     Mappa(),
     InfoPiste(),
-    SceltaComprensorio(),
     AboutUs(),
   ];
 
@@ -84,9 +84,7 @@ class _MyHomePageState extends State<MyHomePage> {
     // than having to individually change instances of widgets.
 
     var container;
-    if (currentPage == DrawerSection.cambiaComprensorio) {
-      container = SceltaComprensorio();
-    } else if (currentPage == DrawerSection.informazioni) {
+    if (currentPage == DrawerSection.informazioni) {
       container = AboutUs();
     } else if (currentPage == DrawerSection.mappa) {
       container = Mappa();
@@ -205,12 +203,7 @@ class _MyHomePageState extends State<MyHomePage> {
             backgroundColor: Colors.lightBlue,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.change_circle),
-            label: "Scelta comprensorio",
-            backgroundColor: Colors.lightBlue,
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.info_outline),
+            icon: Icon(Icons.info_outline_rounded),
             label: "About Us",
             backgroundColor: Colors.lightBlue,
           ),
@@ -227,8 +220,6 @@ class _MyHomePageState extends State<MyHomePage> {
         children: [
           menuItem(0, "Mappa", Icons.map,
               currentPage == DrawerSection.mappa ? true : false),
-          menuItem(1, "Cambia Comprensorio", Icons.change_circle,
-              currentPage == DrawerSection.cambiaComprensorio ? true : false),
           menuItem(2, "Informazioni", Icons.info_outline,
               currentPage == DrawerSection.informazioni ? true : false),
         ],
@@ -245,8 +236,7 @@ class _MyHomePageState extends State<MyHomePage> {
           setState(() {
             switch (id) {
               case 0: currentPage = DrawerSection.mappa;
-              case 1: currentPage = DrawerSection.cambiaComprensorio;
-              case 2: currentPage = DrawerSection.informazioni;
+              case 1: currentPage = DrawerSection.informazioni;
             }
           });
         },
@@ -279,6 +269,5 @@ class _MyHomePageState extends State<MyHomePage> {
 
 enum DrawerSection {
   mappa,
-  cambiaComprensorio,
   informazioni,
 }
