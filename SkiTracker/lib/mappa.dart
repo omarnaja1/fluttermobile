@@ -18,7 +18,6 @@ class Mappa extends StatefulWidget {
 }
 
 class _MappaState extends State<Mappa> {
-  final Color titleColor = Colors.white;
 
   int _counter = 0;
 
@@ -34,9 +33,13 @@ class _MappaState extends State<Mappa> {
   @override
   Widget build(BuildContext context) {
 
+
+
     return Scaffold(
 
-      body: Center(
+      backgroundColor: Colors.indigo,
+
+      body: const Center(
         // Center is a layout widget. It takes a single child and positions it
         // in the middle of the parent.
         child: Column(
@@ -55,7 +58,7 @@ class _MappaState extends State<Mappa> {
           // wireframe for each widget.
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            const Text(
+            Text(
               'Mappa',
             ),
             Text(

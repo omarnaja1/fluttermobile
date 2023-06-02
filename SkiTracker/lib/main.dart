@@ -5,6 +5,8 @@ import 'package:skitracker/about_us.dart';
 import 'package:skitracker/mappa.dart';
 import 'package:skitracker/navigation_drawer.dart';
 
+import 'info_piste.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -62,8 +64,15 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final Color titleColor = Colors.white;
-  var currentPage = DrawerSection.mappa;
+ var currentPage = DrawerSection.mappa;
+
   int _currentIndex = 0;
+  final screens = [
+    Mappa(),
+    InfoPiste(),
+    SceltaComprensorio(),
+    AboutUs(),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -83,7 +92,10 @@ class _MyHomePageState extends State<MyHomePage> {
       container = Mappa();
     }
 
+
     return Scaffold(
+      backgroundColor: Colors.indigoAccent,
+
       appBar: AppBar(
 
         title: Text(
@@ -119,7 +131,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
          */
       ),
-      body: container,
+
+      //body: container,
+      body: screens[_currentIndex],
       /*
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
@@ -166,10 +180,19 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
 
+
+
       //Bottom Navigation Bar
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.grey,
+
         currentIndex: _currentIndex,
+        onTap: (value) {
+          setState(() {
+            _currentIndex = value;
+          });
+        },
+
+        backgroundColor: Colors.white,
         items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.map),
@@ -182,26 +205,18 @@ class _MyHomePageState extends State<MyHomePage> {
             backgroundColor: Colors.lightBlue,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.history),
-            label: "Cronologia",
+            icon: Icon(Icons.change_circle),
+            label: "Scelta comprensorio",
+            backgroundColor: Colors.lightBlue,
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.info_outline),
+            label: "About Us",
             backgroundColor: Colors.lightBlue,
           ),
         ],
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
       ),
 
-    /*    floatingActionButton: FloatingActionButton(
-          onPressed: _incrementCounter,
-         //  tooltip: 'Increment',
-          child: const Icon(Icons.location_on),
-        )
-
-
-     */
     );
   }
   Widget MyDrawerList(){
