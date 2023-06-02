@@ -14,7 +14,7 @@ class _InfoPisteState extends State<InfoPiste> {
 
     return Scaffold(
 
-        backgroundColor: Colors.indigo,
+        backgroundColor: Color.fromRGBO(203, 235, 236, 1.0),
 
         body: const Center(
           child: Column(
@@ -28,6 +28,7 @@ class _InfoPisteState extends State<InfoPiste> {
         ),
 
         floatingActionButton: FloatingActionButton(
+          backgroundColor: Color.fromRGBO(161, 149, 200, 1.0),
           onPressed: () {
             Navigator.push(
               context,

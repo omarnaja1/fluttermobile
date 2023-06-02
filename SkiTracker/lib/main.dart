@@ -65,7 +65,6 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final Color titleColor = Colors.white;
- var currentPage = DrawerSection.mappa;
 
   int _currentIndex = 0;
   final screens = [
@@ -83,16 +82,8 @@ class _MyHomePageState extends State<MyHomePage> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
 
-    var container;
-    if (currentPage == DrawerSection.informazioni) {
-      container = AboutUs();
-    } else if (currentPage == DrawerSection.mappa) {
-      container = Mappa();
-    }
-
-
     return Scaffold(
-      backgroundColor: Colors.indigoAccent,
+      backgroundColor: Color.fromRGBO(203, 235, 236, 1.0),
 
       appBar: AppBar(
 
@@ -103,19 +94,23 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ),
         //  centerTitle: true,
-        backgroundColor: Colors.lightBlue,
+        backgroundColor: Color.fromRGBO(44, 124, 163, 1.0),
+
         elevation: 0.0,
 
+        /*
         bottom: PreferredSize(
           preferredSize: Size.fromHeight(20.0),
           child: Text(
             widget.subtitle ?? '',
+            textAlign: TextAlign.left,
             style: TextStyle(
               color: Colors.white,
               fontSize: 16.0,
             ),
           ),
         ),
+         */
 
 
         /*
@@ -130,7 +125,6 @@ class _MyHomePageState extends State<MyHomePage> {
          */
       ),
 
-      //body: container,
       body: screens[_currentIndex],
       /*
       body: Center(
@@ -165,21 +159,6 @@ class _MyHomePageState extends State<MyHomePage> {
       */
 
 
-      drawer: Drawer(
-        child: SingleChildScrollView(
-          child: Container(
-            child: Column(
-              children: [
-                MyHeaderDrawer(),
-                MyDrawerList(),
-              ],
-            ),
-          ),
-        ),
-      ),
-
-
-
       //Bottom Navigation Bar
       bottomNavigationBar: BottomNavigationBar(
 
@@ -212,62 +191,4 @@ class _MyHomePageState extends State<MyHomePage> {
 
     );
   }
-  Widget MyDrawerList(){
-    return Container(
-      padding: EdgeInsets.only(top: 15,
-      ),
-      child: Column(
-        children: [
-          menuItem(0, "Mappa", Icons.map,
-              currentPage == DrawerSection.mappa ? true : false),
-          menuItem(2, "Informazioni", Icons.info_outline,
-              currentPage == DrawerSection.informazioni ? true : false),
-        ],
-      ),
-    );
-  }
-
-  Widget menuItem(int id, String title, IconData icon, bool selected){
-    return Material(
-      color : selected ? Colors.lightBlue : Colors.transparent,
-      child: InkWell(
-        onTap: (){
-          Navigator.pop(context);
-          setState(() {
-            switch (id) {
-              case 0: currentPage = DrawerSection.mappa;
-              case 1: currentPage = DrawerSection.informazioni;
-            }
-          });
-        },
-        child: Padding(
-          padding: EdgeInsets.all(15.0),
-          child: Row(
-            children: [
-              Expanded(
-                child: Icon(
-                  icon,
-                  size: 20,
-                  color: Colors.black,
-                ),
-              ),
-              Expanded(
-                flex: 3,
-                child: Text(
-                  title,
-                  style: TextStyle(
-                    color: Colors.black, fontSize: 16,),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-enum DrawerSection {
-  mappa,
-  informazioni,
 }

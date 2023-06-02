@@ -37,7 +37,7 @@ class _MappaState extends State<Mappa> {
 
     return Scaffold(
 
-      backgroundColor: Colors.indigo,
+      backgroundColor: Color.fromRGBO(203, 235, 236, 1.0),
 
       body: const Center(
         // Center is a layout widget. It takes a single child and positions it
@@ -69,6 +69,7 @@ class _MappaState extends State<Mappa> {
       ),
 
         floatingActionButton: FloatingActionButton(
+          backgroundColor: Color.fromRGBO(161, 149, 200, 1.0),
           onPressed: _geoLocation,
           tooltip: 'Increment',
           child: const Icon(Icons.location_on),

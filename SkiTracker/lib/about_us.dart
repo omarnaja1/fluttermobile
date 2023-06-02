@@ -11,20 +11,30 @@ class _AboutUsState extends State<AboutUs> {
   Widget build(BuildContext context) {
     return Scaffold(
 
-        backgroundColor: Colors.indigo,
+        backgroundColor: Color.fromRGBO(203, 235, 236, 1.0),
 
-        body: const Center(
+        body: Center(
 
         child: Column(
 
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-        //  Image.asset('assets/images/icona_progetto.png'),
+          Image.asset(
+            'assets/images/icona_progetto.png', //indirizzo
+            width: 320, //lunghezza
+            height: 100, //altezza
+          ),
+
+          SizedBox(height: 20), //spaziatura di 16px
+
           Text(
          'Sviluppatori: Arduini Federico, Naja Omar',
            style: TextStyle(
               fontSize: 20),
          ),
+
+          SizedBox(height: 8),
+
           Text(
          'Versione: 1.0',
            style: TextStyle(
