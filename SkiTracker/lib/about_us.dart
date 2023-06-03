@@ -19,19 +19,32 @@ class _AboutUsState extends State<AboutUs> {
 
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
+          Text(
+            'SkiTracker',
+            style: TextStyle(
+              fontSize: 50
+            ),
+          ),
+
+          SizedBox(height: 35),
+
           Image.asset(
             'assets/images/icona_progetto.png', //indirizzo
             width: 320, //lunghezza
             height: 100, //altezza
           ),
 
-          SizedBox(height: 20), //spaziatura di 16px
+          SizedBox(height: 35), // margine verticale in basso
 
-          Text(
-         'Sviluppatori: Arduini Federico, Naja Omar',
-           style: TextStyle(
-              fontSize: 20),
-         ),
+          Padding(padding: EdgeInsets.only(left: 20, right: 20), child:
+            Text(
+              'Sviluppatori: Arduini Federico, Naja Omar',
+              style: TextStyle(
+                fontSize: 20
+              ),
+              textAlign: TextAlign.center
+            )
+          ),
 
           SizedBox(height: 8),
 

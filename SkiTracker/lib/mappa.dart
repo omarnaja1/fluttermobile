@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:latlong2/latlong.dart';
+
+import 'dialogs.dart';
 
 class Mappa extends StatefulWidget {
   const Mappa({super.key});
@@ -18,61 +23,99 @@ class Mappa extends StatefulWidget {
 }
 
 class _MappaState extends State<Mappa> {
+  MapController mapController = MapController();
+  Position? currentPosition;
+  List<Marker> markers = [];
 
-  int _counter = 0;
+  // Inizializzo lo StatefulWidget, andando ad ottenere la posizione GPS iniziale.
+  @override
+  void initState() {
+    super.initState();
+    getCurrentLocation();
+  }
 
-  void _geoLocation() {
-    // This call to setState tells the Flutter framework that something has
-    // changed in this State, which causes it to rerun the build method below
-    // so that the display can reflect the updated values. If we changed
-    // _counter without calling setState(), then the build method would not be
-    // called again, and so nothing would appear to happen.
-    _counter++;
+  // Metodo asincrono che si occupa di ottenere la posizione iniziale.
+  Future<void> getCurrentLocation() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    // Controllo che sia abilitato il GPS sul telefono.
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      // Servizio di localizzazione disabilitato!!
+      AppDialogs().openDialog(context, "Errore", "É consigliato l'uso della posizione GPS per poter usare al meglio l'app. Per poter conoscere la tua posizione in tempo reale nella mappa, abilita la posizione GPS.");
+      return;
+    }
+
+    // Controllo che l'utente abbia consentito l'accesso al GPS
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      // Se l'utente non ha mai consentito l'accesso al GPS, glielo chiedo
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        // Permesso di localizzazione negato dall'utente!!!
+        AppDialogs().openDialog(context, "Errore", "Non è possibile ottenere la posizione in tempo reale dell'utente perchè ne è stato negato l'accesso.");
+        return;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      // Permesso di localizzazione negato permanentemente!!
+      AppDialogs().openDialog(context, "Errore", "Il servizio di posizione GPS non è in esecuzione. Non sarà possibile conoscere la tua posizione in tempo reale sulla mappa.");
+      return;
+    }
+
+    Position position = await Geolocator.getCurrentPosition();
+    setState(() {
+      currentPosition = position;
+      markers.add(Marker(
+        width: 40.0,
+        height: 40.0,
+        point: LatLng(position.latitude, position.longitude),
+        builder: (ctx) => Container(
+          child: Icon(
+            Icons.location_on,
+            color: Colors.red,
+            size: 50.0,
+          ),
+        ),
+      ));
+    });
+  }
+
+  // Se è nota la posizione dell'utente, centro la mappa sulla sua posizione.
+  void centerMapOnPosition() {
+    if (currentPosition != null)
+      mapController.move(LatLng(currentPosition!.latitude, currentPosition!.longitude), 15.0);
   }
 
   @override
   Widget build(BuildContext context) {
-
-
-
     return Scaffold(
+        backgroundColor: Color.fromRGBO(203, 235, 236, 1.0),
 
-      backgroundColor: Color.fromRGBO(203, 235, 236, 1.0),
-
-      body: const Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'Mappa',
+        body: FlutterMap(
+          mapController: mapController,
+          options: MapOptions(
+            center: LatLng(46.3678, 10.6593), // Posizione di default (Pejo)
+            zoom: 13.0,
+          ),
+          children: [
+            TileLayer(
+                urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                userAgentPackageName: 'it.omarfederico.skitracker'
             ),
-            Text(
-              'Qui verra visualizzata la mappa',
-            ),
+            MarkerLayer(
+              markers: markers,
+            )
           ],
         ),
-      ),
 
         floatingActionButton: FloatingActionButton(
           backgroundColor: Color.fromRGBO(161, 149, 200, 1.0),
-          onPressed: _geoLocation,
           tooltip: 'Increment',
-          child: const Icon(Icons.location_on),
+          onPressed: centerMapOnPosition,
+          child: const Icon(Icons.location_on, color: Colors.white),
         )
     );
   }
