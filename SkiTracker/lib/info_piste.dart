@@ -32,7 +32,8 @@ class _InfoPisteState extends State<InfoPiste> {
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => SceltaComprensorio()),
+              MaterialPageRoute(builder: (context) =>
+                  SceltaComprensorio(title: 'Scegli Comprensorio',)),
             );
           },
           child: const Icon(Icons.change_circle, color: Colors.white),
