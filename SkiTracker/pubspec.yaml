@@ -40,6 +40,10 @@ dependencies:
   flutter_map: ^4.0.0
   # per le coordinate
   latlong2: ^0.8.2
+  # per il database interno basato su SQLite
+  sqflite: ^2.2.8+4
+  # per ottenere i path dei vari assets dell'applicazione
+  path_provider: ^2.0.15
 
 dev_dependencies:
   flutter_test:
@@ -68,6 +72,7 @@ flutter_icons:
 flutter:
   assets:
     - assets/images/
+    - assets/app.db
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

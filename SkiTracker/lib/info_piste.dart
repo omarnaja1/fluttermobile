@@ -1,6 +1,8 @@
 import 'package:SkiTracker/scelta_comprensorio.dart';
 import 'package:flutter/material.dart';
 
+import 'database/DbHelper.dart';
+
 class InfoPiste extends StatefulWidget{
   const InfoPiste({super.key});
   @override
@@ -8,20 +10,34 @@ class InfoPiste extends StatefulWidget{
 }
 
 class _InfoPisteState extends State<InfoPiste> {
+  var skiAreaId = 0;
+
+  void initState() {
+    super.initState();
+    getSelectedSkiArea().then((value) => skiAreaId = value);
+  }
+
+  Future<int> getSelectedSkiArea() async {
+    final id = await DbHelper.getComprensorioSelezionato();
+
+    if (id == null)
+      return 0;
+    else
+      return skiAreaId;
+  }
 
   @override
   Widget build(BuildContext context) {
 
     return Scaffold(
-
         backgroundColor: Color.fromRGBO(203, 235, 236, 1.0),
 
-        body: const Center(
+        body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Text(
-                'Info piste',
+                skiAreaId.toString(),
               ),
             ],
           ),

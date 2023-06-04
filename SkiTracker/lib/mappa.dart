@@ -3,6 +3,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 
+import 'database/DbHelper.dart';
 import 'dialogs.dart';
 
 class Mappa extends StatefulWidget {
@@ -31,7 +32,21 @@ class _MappaState extends State<Mappa> {
   @override
   void initState() {
     super.initState();
+    getSelectedSkiArea();
     getCurrentLocation();
+  }
+
+  Future<int?> getSelectedSkiArea() async {
+    // Controllo se l'utente ha selezionato un comprensorio, ottenendone il suo ID.
+    // Se l'utente non ne ha selezionato nessuno, lo avviso e glielo faccio selezionare.
+    final skiAreaId = await DbHelper.getComprensorioSelezionato();
+
+    if (skiAreaId == null) {
+      AppDialogs().openDialog(context, "Benvenuto in SkiTracker", "Per iniziare, seleziona un comprensorio di cui visualizzare la mappa. Per selezionare "
+          "il comprensorio, vai nella scheda Info comprensorio e poi premi il pulsante Cambia comprensorio (in basso a destra).");
+    }
+
+    return skiAreaId;
   }
 
   // Metodo asincrono che si occupa di ottenere la posizione iniziale.
