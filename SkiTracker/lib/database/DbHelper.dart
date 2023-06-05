@@ -4,6 +4,8 @@ import 'package:path/path.dart' as path;
 import 'dart:io';
 import 'package:flutter/services.dart';
 
+const String USER_ID = "flutteruser";
+
 class DbHelper {
   // Metodo di apertura della connessione al Database.
   static Future<Database> openDB() async {
@@ -25,6 +27,7 @@ class DbHelper {
       pathToDatabase,
       version: 1
     );
+
     return database;
   }
 
@@ -34,7 +37,7 @@ class DbHelper {
     final results = await database.query("Utente", columns: ["idComprensorio"]);
 
     if (results.isNotEmpty) {
-      return results.first["idComprensorio"] as int;
+      return results.firstOrNull?["idComprensorio"] as int?;
     } else {
       return null;
     }
@@ -55,5 +58,17 @@ class DbHelper {
     ).toList();
 
     return comprensori;
+  }
+
+  // Imposto l'ID del comprensorio selezionato per l'utente
+  Future<void> setComprensorioSelezionato(int idComprensorio) async {
+    // apro il db
+    Database database = await openDB();
+
+    // aggiorno il valore idComprensorio per l'utente
+    await database.update('Utente', {'idComprensorio': idComprensorio}, where: 'id = "$USER_ID"');
+
+    // chiudo il db
+    await database.close();
   }
 }

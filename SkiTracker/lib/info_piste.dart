@@ -10,20 +10,20 @@ class InfoPiste extends StatefulWidget{
 }
 
 class _InfoPisteState extends State<InfoPiste> {
-  var skiAreaId = 0;
+  int? skiAreaId = 0;
 
   void initState() {
     super.initState();
-    getSelectedSkiArea().then((value) => skiAreaId = value);
+    getSelectedSkiArea();
   }
 
-  Future<int> getSelectedSkiArea() async {
+  Future<void> getSelectedSkiArea() async {
     final id = await DbHelper.getComprensorioSelezionato();
 
-    if (id == null)
-      return 0;
-    else
-      return skiAreaId;
+    setState(() {
+      if (id != null)
+        this.skiAreaId = id;
+    });
   }
 
   @override
@@ -33,11 +33,14 @@ class _InfoPisteState extends State<InfoPiste> {
         backgroundColor: Color.fromRGBO(203, 235, 236, 1.0),
 
         body: Center(
-          child: Column(
+          child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              Text(
-                skiAreaId.toString(),
+              new Row(
+                children: <Widget>[
+                  new Text("data"),
+                  new Text("data"),
+                ],
               ),
             ],
           ),
@@ -45,12 +48,20 @@ class _InfoPisteState extends State<InfoPiste> {
 
         floatingActionButton: FloatingActionButton(
           backgroundColor: Color.fromRGBO(161, 149, 200, 1.0),
-          onPressed: () {
-            Navigator.push(
+          onPressed: () async {
+            final result = await Navigator.push(
               context,
               MaterialPageRoute(builder: (context) =>
                   SceltaComprensorio(title: 'Scegli Comprensorio',)),
             );
+
+            // controllo se il widget scegliComprensorio ha chiesto di ricaricare questo
+            // in seguito alla selezione di un comprensorio
+            if (result != null) {
+              setState(() {
+                this.skiAreaId = result;
+              });
+            }
           },
           child: const Icon(Icons.change_circle, color: Colors.white),
         ),

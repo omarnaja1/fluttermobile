@@ -33,6 +33,13 @@ class _SceltaComprensorioState extends State<SceltaComprensorio> {
     });
   }
 
+  void setComprensorioSelezionato(int idComprensorio) {
+    // imposto l'ID del comprensorio selezionato sul db
+    DbHelper().setComprensorioSelezionato(idComprensorio);
+    // chiudo questa vista e ritorno alla home
+    Navigator.pop(context, idComprensorio);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -96,8 +103,14 @@ class _SceltaComprensorioState extends State<SceltaComprensorio> {
                 itemBuilder: (context, index) {
                   return GestureDetector(
                       onTap: () {
-                        print(
-                            "Selezionato comprensorio ${comprensori[index].id}");
+                        late int selectedId;
+
+                        if (_textEditingController.text.isNotEmpty)
+                          selectedId = comprensoriOnSearch[index].id;
+                        else
+                          selectedId = comprensori[index].id;
+
+                        this.setComprensorioSelezionato(selectedId);
                       },
                       child: Row(
                         children: [
