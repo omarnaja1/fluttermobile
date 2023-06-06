@@ -130,7 +130,9 @@ class _SceltaComprensorioState extends State<SceltaComprensorio> {
                             ),
                           ),
                         ],
-                      ));
-                }));
+                      )
+                  );
+                })
+    );
   }
 }
