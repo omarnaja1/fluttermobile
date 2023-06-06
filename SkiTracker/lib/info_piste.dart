@@ -1,6 +1,7 @@
 import 'package:SkiTracker/scelta_comprensorio.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 import 'database/DbHelper.dart';
 
@@ -19,6 +20,8 @@ class _InfoPisteState extends State<InfoPiste> {
   int? numImpiantiRisalitaComprensorio = 0;
   int? altMinComprensorio = 0;
   int? altMaxComprensorio = 0;
+  int? snowparkComprensorio = 0;
+  int ? pisteNotturneComprensorio = 0;
 
   // Elenco delle piste
  // List<Piste> piste = [];
@@ -40,6 +43,8 @@ class _InfoPisteState extends State<InfoPiste> {
     final impiantiRisalita = await DbHelper.getImpiantiRisalitaComprensorioSelezionato();
     final altMin = await DbHelper.getAltMinComprensorioSelezionato();
     final altMax = await DbHelper.getAltMaxComprensorioSelezionato();
+    final snowpark = await DbHelper.getSnowparkComprensorioSelezionato();
+    final pisteNotturne = await DbHelper.getPistaNotturnaComprensorioSelezionato();
 
     setState(() {
       if (id != null)
@@ -51,6 +56,8 @@ class _InfoPisteState extends State<InfoPiste> {
         this.numImpiantiRisalitaComprensorio = impiantiRisalita;
         this.altMinComprensorio = altMin;
         this.altMaxComprensorio = altMax;
+        this.snowparkComprensorio = snowpark;
+        this.pisteNotturneComprensorio = pisteNotturne;
     });
   }
 
@@ -82,7 +89,7 @@ class _InfoPisteState extends State<InfoPiste> {
               fontWeight: FontWeight.bold,
               color: Colors.white,
               fontSize: 35,
-              backgroundColor: Colors.green,
+              backgroundColor: stato == 1 ? Colors.green : Colors.red,
             ),
           ),
         ],
@@ -207,20 +214,28 @@ class _InfoPisteState extends State<InfoPiste> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("Snowpark",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                  fontSize: 35,
-                  backgroundColor: Colors.white,
-                ),
+            Visibility(
+            visible: snowparkComprensorio == 1,
+            child: Text(
+              "Snowpark",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+                fontSize: 35,
+                backgroundColor: Colors.white,
               ),
-              Text("Piste notturne",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                  fontSize: 35,
-                  backgroundColor: Color.fromRGBO(37, 40, 80, 1),
+            ),
+          ),
+              Visibility(
+                visible: pisteNotturneComprensorio == 1,
+                child: Text(
+                  "Piste notturne",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                    fontSize: 35,
+                    backgroundColor: Colors.white,
+                  ),
                 ),
               ),
             ],
@@ -239,8 +254,6 @@ class _InfoPisteState extends State<InfoPiste> {
 
       Expanded(
         child: ListView.builder(
-
-
               itemCount: piste.length,
               itemBuilder: (context, index){
                 return ListTile(

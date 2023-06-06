@@ -115,6 +115,29 @@ class DbHelper {
     }
   }
 
+  // Verifico se il comprensorio selezionato presenta snowpark
+  static Future<int?> getSnowparkComprensorioSelezionato() async {
+    final database = await openDB();
+    final results = await database.query("Comprensorio", columns: ["snowpark"]);
+
+    if (results.isNotEmpty) {
+      return results.firstOrNull?["snowpark"] as int?;
+    } else {
+      return null;
+    }
+  }
+
+  static Future<int?> getPistaNotturnaComprensorioSelezionato() async {
+    final database = await openDB();
+    final results = await database.query("Comprensorio", columns: ["pisteNotturne"]);
+
+    if (results.isNotEmpty) {
+      return results.firstOrNull?["pisteNotturne"] as int?;
+    } else {
+      return null;
+    }
+  }
+
   // Ottengo il sito del comprensorio selezionato dall'utente.
   static Future<String?> getSitoComprensorioSelezionato() async {
     final database = await openDB();
