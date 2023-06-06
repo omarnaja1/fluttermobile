@@ -43,113 +43,6 @@ class DbHelper {
     }
   }
 
-  // Ottengo il nome del comprensorio selezionato dall'utente.
-  static Future<String?> getNomeComprensorioSelezionato() async {
-    final database = await openDB();
-    final results = await database.query("Comprensorio", columns: ["nome"]);
-
-    if (results.isNotEmpty) {
-      return results.firstOrNull?["nome"] as String?;
-    } else {
-      return null;
-    }
-  }
-
-  // Ottengo il nome del comprensorio selezionato dall'utente.
-  static Future<int?> getStatoComprensorioSelezionato() async {
-    final database = await openDB();
-    final results = await database.query("Comprensorio", columns: ["aperto"]);
-
-    if (results.isNotEmpty) {
-      return results.firstOrNull?["aperto"] as int?;
-    } else {
-      return null;
-    }
-  }
-
-  // Ottengo il numero di piste del comprensorio selezionato dall'utente.
-  static Future<int?> getNumPisteComprensorioSelezionato() async {
-    final database = await openDB();
-    final results = await database.query("Comprensorio", columns: ["numPiste"]);
-
-    if (results.isNotEmpty) {
-      return results.firstOrNull?["numPiste"] as int?;
-    } else {
-      return null;
-    }
-  }
-
-  // Ottengo il numero di impianti di risalita del comprensorio selezionato dall'utente.
-  static Future<int?> getImpiantiRisalitaComprensorioSelezionato() async {
-    final database = await openDB();
-    final results = await database.query("Comprensorio", columns: ["numImpianti"]);
-
-    if (results.isNotEmpty) {
-      return results.firstOrNull?["numImpianti"] as int?;
-    } else {
-      return null;
-    }
-  }
-
-  // Ottengo l'altitudine minima del comprensorio selezionato dall'utente.
-  static Future<int?> getAltMinComprensorioSelezionato() async {
-    final database = await openDB();
-    final results = await database.query("Comprensorio", columns: ["minAltitudine"]);
-
-    if (results.isNotEmpty) {
-      return results.firstOrNull?["minAltitudine"] as int?;
-    } else {
-      return null;
-    }
-  }
-
-  // Ottengo l'altitudine massima del comprensorio selezionato dall'utente.
-  static Future<int?> getAltMaxComprensorioSelezionato() async {
-    final database = await openDB();
-    final results = await database.query("Comprensorio", columns: ["maxAltitudine"]);
-
-    if (results.isNotEmpty) {
-      return results.firstOrNull?["maxAltitudine"] as int?;
-    } else {
-      return null;
-    }
-  }
-
-  // Verifico se il comprensorio selezionato presenta snowpark
-  static Future<int?> getSnowparkComprensorioSelezionato() async {
-    final database = await openDB();
-    final results = await database.query("Comprensorio", columns: ["snowpark"]);
-
-    if (results.isNotEmpty) {
-      return results.firstOrNull?["snowpark"] as int?;
-    } else {
-      return null;
-    }
-  }
-
-  static Future<int?> getPistaNotturnaComprensorioSelezionato() async {
-    final database = await openDB();
-    final results = await database.query("Comprensorio", columns: ["pisteNotturne"]);
-
-    if (results.isNotEmpty) {
-      return results.firstOrNull?["pisteNotturne"] as int?;
-    } else {
-      return null;
-    }
-  }
-
-  // Ottengo il sito del comprensorio selezionato dall'utente.
-  static Future<String?> getSitoComprensorioSelezionato() async {
-    final database = await openDB();
-    final results = await database.query("Comprensorio", columns: ["website"]);
-
-    if (results.isNotEmpty) {
-      return results.firstOrNull?["website"] as String?;
-    } else {
-      return null;
-    }
-  }
-
   // Ottengo la lista dei comprensori
   Future<List<Comprensorio>> getListaComprensori() async {
     // apro il db
@@ -177,5 +70,21 @@ class DbHelper {
 
     // chiudo il db
     await database.close();
+  }
+
+  // Ottiene i dettagli di un comprensorio dato il suo ID.
+  Future<Comprensorio?> getDettagliComprensorio(int id) async {
+    // apro il db
+    Database database = await openDB();
+
+    // ottengo i dettagli del comprensorio
+    final results = await database.query('Comprensorio', where: 'id = $id', limit: 1);
+    if (results.isNotEmpty) {
+      final comprensorioRow = results.first;
+      return Comprensorio.fromMap(comprensorioRow);
+    }
+
+    // se non è stato trovato alcun comprensorio...
+    return null;
   }
 }

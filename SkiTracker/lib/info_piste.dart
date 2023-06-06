@@ -1,3 +1,4 @@
+import 'package:SkiTracker/models/Comprensorio.dart';
 import 'package:SkiTracker/scelta_comprensorio.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher_string.dart';
@@ -16,16 +17,10 @@ class InfoPiste extends StatefulWidget {
 }
 
 class _InfoPisteState extends State<InfoPiste> {
-  int? skiAreaId = 0;
-  String? nomeComprensorio = "";
-  int? stato = 1;
-  int? numPisteComrprensorio = 0;
-  String? sitoComprensorio = "";
-  int? numImpiantiRisalitaComprensorio = 0;
-  int? altMinComprensorio = 0;
-  int? altMaxComprensorio = 0;
-  int? snowparkComprensorio = 0;
-  int? pisteNotturneComprensorio = 0;
+  Comprensorio? mySkiArea = null;
+  int stato = 1;
+  int snowparkComprensorio = 0;
+  int pisteNotturneComprensorio = 0;
 
   // Elenco delle piste
   // List<Piste> piste = [];
@@ -44,264 +39,274 @@ class _InfoPisteState extends State<InfoPiste> {
 
   Future<void> getSelectedSkiArea() async {
     final id = await DbHelper.getComprensorioSelezionato();
-    final nome = await DbHelper.getNomeComprensorioSelezionato();
-    final aperto = await DbHelper.getStatoComprensorioSelezionato();
-    final sito = await DbHelper.getSitoComprensorioSelezionato();
-    final numPiste = await DbHelper.getNumPisteComprensorioSelezionato();
-    final impiantiRisalita =
-        await DbHelper.getImpiantiRisalitaComprensorioSelezionato();
-    final altMin = await DbHelper.getAltMinComprensorioSelezionato();
-    final altMax = await DbHelper.getAltMaxComprensorioSelezionato();
-    final snowpark = await DbHelper.getSnowparkComprensorioSelezionato();
-    final pisteNotturne =
-        await DbHelper.getPistaNotturnaComprensorioSelezionato();
 
-    setState(() {
-      if (id != null) this.skiAreaId = id;
-      this.nomeComprensorio = nome;
-      this.stato = aperto;
-      this.sitoComprensorio = sito;
-      this.numPisteComrprensorio = numPiste;
-      this.numImpiantiRisalitaComprensorio = impiantiRisalita;
-      this.altMinComprensorio = altMin;
-      this.altMaxComprensorio = altMax;
-      this.snowparkComprensorio = snowpark;
-      this.pisteNotturneComprensorio = pisteNotturne;
-    });
+    if (id != null) {
+      final skiArea = await DbHelper().getDettagliComprensorio(id);
+
+      if (this.mySkiArea != null) {
+        setState(() {
+          this.mySkiArea = skiArea;
+        });
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color.fromRGBO(203, 235, 236, 1.0),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: <Widget>[
-          SizedBox(height: 10),
-          Padding(
-            padding: EdgeInsets.symmetric(
-                vertical: PADDING_VERTICAL, horizontal: PADDING_HORIZONTAL),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      body: Visibility(
+        visible: this.mySkiArea != null,
+        maintainState: false,
+        replacement: Center(
+          child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
-                  "$nomeComprensorio",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                    fontSize: 28,
-                  ),
+                Image.asset(
+                    'assets/images/select_skiarea.png',
+                    width: 300,
                 ),
+                SizedBox(height: 10),
                 Text(
-                  "Aperto",
+                    "Tocca il pulsante in basso a destra per selezionare il comprensorio.",
                   style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                    fontSize: 20,
-                    backgroundColor: stato == 1 ? Colors.green : Colors.red,
+                    fontSize: 17,
                   ),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(height: 10),
-          Padding(
-            padding: EdgeInsets.symmetric(
-                vertical: PADDING_VERTICAL, horizontal: PADDING_HORIZONTAL),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "🏂 Numero di piste: ",
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: INDICATORS_SIZE,
-                  ),
-                ),
-                Text(
-                  "$numPisteComrprensorio",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                    fontSize: INDICATORS_SIZE,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(height: 10),
-          Padding(
-            padding: EdgeInsets.symmetric(
-                vertical: PADDING_VERTICAL, horizontal: PADDING_HORIZONTAL),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "🚡 Impianti di risalita: ",
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: INDICATORS_SIZE,
-                  ),
-                ),
-                Text(
-                  "$numImpiantiRisalitaComprensorio",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                    fontSize: INDICATORS_SIZE,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(height: 10),
-          Padding(
-            padding: EdgeInsets.symmetric(
-                vertical: PADDING_VERTICAL, horizontal: PADDING_HORIZONTAL),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "⛰ Altitudine minima: ",
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: INDICATORS_SIZE,
-                  ),
-                ),
-                Text(
-                  "$altMinComprensorio m s.l.m.",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                    fontSize: INDICATORS_SIZE,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(height: 10),
-          Padding(
-            padding: EdgeInsets.symmetric(
-                vertical: PADDING_VERTICAL, horizontal: PADDING_HORIZONTAL),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "🏔 Altitudine massima: ",
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: INDICATORS_SIZE,
-                  ),
-                ),
-                Text(
-                  "$altMaxComprensorio m s.l.m.",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                    fontSize: INDICATORS_SIZE,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(height: 10),
-          Padding(
-            padding: EdgeInsets.symmetric(
-                vertical: PADDING_VERTICAL, horizontal: PADDING_HORIZONTAL),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "Sito: ",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                    fontSize: INDICATORS_SIZE,
-                  ),
-                ),
-                GestureDetector(
-                  onTap: () => launchUrlString(sitoComprensorio!),
-                  child: Text(
-                    "$sitoComprensorio",
+                  textAlign: TextAlign.center,
+                )
+              ]),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            SizedBox(height: 10),
+            Padding(
+              padding: EdgeInsets.symmetric(
+                  vertical: PADDING_VERTICAL, horizontal: PADDING_HORIZONTAL),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    this.mySkiArea?.nome ?? "N/A",
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      color: Colors.blueAccent,
-                      fontSize: INDICATORS_SIZE,
-                      decoration: TextDecoration.underline,
+                      color: Colors.black,
+                      fontSize: 28,
                     ),
                   ),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(height: 10),
-          Padding(
-            padding: EdgeInsets.symmetric(
-                vertical: PADDING_VERTICAL, horizontal: PADDING_HORIZONTAL),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Visibility(
-                  visible: snowparkComprensorio == 1,
-                  child: Text(
-                    "✅ Snowpark",
+                  Text(
+                    "Ok",
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      fontSize: 21,
+                      color: Colors.white,
+                      fontSize: 20,
+                      backgroundColor: stato == 1 ? Colors.green : Colors.red,
                     ),
                   ),
-                ),
-                Visibility(
-                  visible: pisteNotturneComprensorio == 1,
-                  child: Text(
-                    "✅ Piste notturne",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 21,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(height: 10),
-          Padding(
-            padding: EdgeInsets.symmetric(
-                vertical: PADDING_VERTICAL, horizontal: PADDING_HORIZONTAL),
-            child: Text(
-              "Elenco piste",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-                fontSize: 28,
+                ],
               ),
             ),
-          ),
-          Expanded(
-            child: ListView.builder(
-                itemCount: piste.length,
-                itemBuilder: (context, index) {
-                  return Padding(
-                      padding: EdgeInsets.symmetric(
-                          vertical: PADDING_VERTICAL,
-                          horizontal: PADDING_HORIZONTAL),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            piste[index].nome,
-                            style: TextStyle(fontSize: 20),
-                          ),
-                          Text(
-                            piste[index].getDifficultyWithIndicator(),
-                            style: TextStyle(fontSize: 20),
-                          )
-                        ],
-                      ));
-                }),
-          ),
-        ],
+            SizedBox(height: 10),
+            Padding(
+              padding: EdgeInsets.symmetric(
+                  vertical: PADDING_VERTICAL, horizontal: PADDING_HORIZONTAL),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "🏂 Numero di piste: ",
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: INDICATORS_SIZE,
+                    ),
+                  ),
+                  Text(
+                    this.mySkiArea != null ? this.mySkiArea?.numPiste as String : "N/A",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                      fontSize: INDICATORS_SIZE,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: 10),
+            Padding(
+              padding: EdgeInsets.symmetric(
+                  vertical: PADDING_VERTICAL, horizontal: PADDING_HORIZONTAL),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "🚡 Impianti di risalita: ",
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: INDICATORS_SIZE,
+                    ),
+                  ),
+                  Text(
+                    "10",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                      fontSize: INDICATORS_SIZE,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: 10),
+            Padding(
+              padding: EdgeInsets.symmetric(
+                  vertical: PADDING_VERTICAL, horizontal: PADDING_HORIZONTAL),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "⛰ Altitudine minima: ",
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: INDICATORS_SIZE,
+                    ),
+                  ),
+                  Text(
+                    "10 m s.l.m.",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                      fontSize: INDICATORS_SIZE,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: 10),
+            Padding(
+              padding: EdgeInsets.symmetric(
+                  vertical: PADDING_VERTICAL, horizontal: PADDING_HORIZONTAL),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "🏔 Altitudine massima: ",
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: INDICATORS_SIZE,
+                    ),
+                  ),
+                  Text(
+                    "10 m s.l.m.",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                      fontSize: INDICATORS_SIZE,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: 10),
+            Padding(
+              padding: EdgeInsets.symmetric(
+                  vertical: PADDING_VERTICAL, horizontal: PADDING_HORIZONTAL),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "Sito: ",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                      fontSize: INDICATORS_SIZE,
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () => launchUrlString("pornhub.com"!),
+                    child: Text(
+                      "pornhub.com",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blueAccent,
+                        fontSize: INDICATORS_SIZE,
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: 10),
+            Padding(
+              padding: EdgeInsets.symmetric(
+                  vertical: PADDING_VERTICAL, horizontal: PADDING_HORIZONTAL),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Visibility(
+                    visible: snowparkComprensorio == 1,
+                    maintainSize: false,
+                    child: Text(
+                      "✅ Snowpark",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 21,
+                      ),
+                    ),
+                  ),
+                  Visibility(
+                    visible: pisteNotturneComprensorio == 1,
+                    maintainSize: false,
+                    child: Text(
+                      "✅ Piste notturne",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 21,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: 10),
+            Padding(
+              padding: EdgeInsets.symmetric(
+                  vertical: PADDING_VERTICAL, horizontal: PADDING_HORIZONTAL),
+              child: Text(
+                "Elenco piste",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                  fontSize: 28,
+                ),
+              ),
+            ),
+            Expanded(
+              child: ListView.builder(
+                  itemCount: piste.length,
+                  itemBuilder: (context, index) {
+                    return Padding(
+                        padding: EdgeInsets.symmetric(
+                            vertical: PADDING_VERTICAL,
+                            horizontal: PADDING_HORIZONTAL),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              piste[index].nome,
+                              style: TextStyle(fontSize: 20),
+                            ),
+                            Text(
+                              piste[index].getDifficultyWithIndicator(),
+                              style: TextStyle(fontSize: 20),
+                            )
+                          ],
+                        ));
+                  }),
+            ),
+          ],
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Color.fromRGBO(161, 149, 200, 1.0),
@@ -317,8 +322,8 @@ class _InfoPisteState extends State<InfoPiste> {
           // controllo se il widget scegliComprensorio ha chiesto di ricaricare questo
           // in seguito alla selezione di un comprensorio
           if (result != null) {
-            setState(() {
-              this.skiAreaId = result;
+            setState(() async {
+              this.mySkiArea = await DbHelper().getDettagliComprensorio(result);
             });
           }
         },
