@@ -1,7 +1,10 @@
+import 'Pista.dart';
+
 class Comprensorio {
   int id;
   String nome;
   int aperto;
+  List<Pista> listaPiste = [];
 
   int numPiste;
   int numImpianti;
@@ -26,5 +29,9 @@ class Comprensorio {
   factory Comprensorio.fromMap(Map<String, dynamic> map) {
     return Comprensorio(map['id'], map['nome'], map['aperto'], map['numPiste'], map['numImpianti'], map['website'],
         map['snowpark'], map['pisteNotturne'], map['lat'], map['long'], map['maxAltitudine'], map['minAltitudine'], map['zoom']);
+  }
+
+  void setPisteList(List<Pista> list) {
+    this.listaPiste = list;
   }
 }

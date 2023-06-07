@@ -4,6 +4,8 @@ import 'package:path/path.dart' as path;
 import 'dart:io';
 import 'package:flutter/services.dart';
 
+import '../models/Pista.dart';
+
 const String USER_ID = "flutteruser";
 
 class DbHelper {
@@ -86,5 +88,33 @@ class DbHelper {
 
     // se non è stato trovato alcun comprensorio...
     return null;
+  }
+
+  // Inserisce una lista di piste nel database.
+  Future<void> insertPiste(int idComprensorio, List<Pista> listaPiste) async {
+    // apro il db
+    Database database = await openDB();
+    // Inserisco le piste
+    for (var pista in listaPiste) {
+      await database.insert("Pista", pista.toMap(), conflictAlgorithm: ConflictAlgorithm.ignore);
+    }
+    // chiudo il db
+    database.close();
+  }
+
+  // Ottengo la lista delle piste di un certo comprensorio
+  Future<List<Pista>> getComprensorioPiste(int idComprensorio) async {
+    // apro il db
+    Database database = await openDB();
+
+    // Ottengo la lista di piste
+    final List<Map<String, dynamic>> result = await database.query('Pista', where: 'idComprensorio = ?', whereArgs: [idComprensorio]);
+    final List<Pista> pistaList = result.map((map) =>
+        Pista(map['nome'], map['difficolta'], map['id'], map['idComprensorio'])
+    ).toList();
+
+    // chiudo il db e ritorno la lista
+    database.close();
+    return pistaList;
   }
 }

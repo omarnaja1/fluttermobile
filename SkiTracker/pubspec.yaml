@@ -45,6 +45,11 @@ dependencies:
   sqflite: ^2.2.8+4
   # per ottenere i path dei vari assets dell'applicazione
   path_provider: ^2.0.15
+  # per effettuare chiamate HTTP alle API
+  http: ^0.13.6
+  # per trattamento file XML
+  xml: ^6.3.0
+
 
 dev_dependencies:
   flutter_test:

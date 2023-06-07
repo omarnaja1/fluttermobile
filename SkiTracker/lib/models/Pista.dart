@@ -1,23 +1,27 @@
 class Pista {
   String nome = "N/A";
   String difficolta = "N/A";
+  late int id;
+  late int idComprensorio;
 
-  Pista(String nome, String difficolta) {
+  Pista(String nome, String difficolta, int id, int idComprensorio) {
     this.nome = nome;
     this.difficolta = this.getItalianDifficulty(difficolta);
+    this.id = id;
+    this.idComprensorio = idComprensorio;
   }
 
   String getItalianDifficulty(String diff) {
     String difficolta = "N/A";
 
     switch(diff) {
-      case 'novice':
+      case 'novice' || 'Novizio':
         difficolta = "Novizio"; break;
-      case 'easy':
+      case 'easy' || 'Facile':
         difficolta = "Facile"; break;
-      case 'intermediate':
+      case 'intermediate' || 'Medio':
         difficolta = "Medio"; break;
-      case 'advanced':
+      case 'advanced' || 'Difficile':
         difficolta = "Difficile"; break;
     }
 
@@ -39,5 +43,14 @@ class Pista {
     }
 
     return difficolta;
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': this.id,
+      'nome': this.nome,
+      'difficolta': this.difficolta,
+      'idComprensorio': this.idComprensorio
+    };
   }
 }

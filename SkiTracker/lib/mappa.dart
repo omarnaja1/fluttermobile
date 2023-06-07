@@ -5,6 +5,7 @@ import 'package:latlong2/latlong.dart';
 
 import 'database/DbHelper.dart';
 import 'dialogs.dart';
+import 'models/Comprensorio.dart';
 
 class Mappa extends StatefulWidget {
   const Mappa({super.key});
@@ -18,7 +19,6 @@ class Mappa extends StatefulWidget {
   // used by the build method of the State. Fields in a Widget subclass are
   // always marked "final".
 
-
   @override
   State<Mappa> createState() => _MappaState();
 }
@@ -27,30 +27,32 @@ class _MappaState extends State<Mappa> {
   MapController mapController = MapController();
   Position? currentPosition;
   List<Marker> markers = [];
+  Comprensorio? mySkiArea = null;
 
   // Inizializzo lo StatefulWidget, andando ad ottenere la posizione GPS iniziale.
   @override
   void initState() {
     super.initState();
     getSelectedSkiArea();
-    getCurrentLocation();
+    checkForLocationPermission();
   }
 
-  Future<int?> getSelectedSkiArea() async {
-    // Controllo se l'utente ha selezionato un comprensorio, ottenendone il suo ID.
-    // Se l'utente non ne ha selezionato nessuno, lo avviso e glielo faccio selezionare.
-    final skiAreaId = await DbHelper.getComprensorioSelezionato();
+  Future<void> getSelectedSkiArea() async {
+    final id = await DbHelper.getComprensorioSelezionato();
 
-    if (skiAreaId == null) {
-      AppDialogs().openDialog(context, "Benvenuto in SkiTracker", "Per iniziare, seleziona un comprensorio di cui visualizzare la mappa. Per selezionare "
-          "il comprensorio, vai nella scheda Info comprensorio e poi premi il pulsante Cambia comprensorio (in basso a destra).");
+    if (id != null) {
+      final skiArea = await DbHelper().getDettagliComprensorio(id);
+
+      if (skiArea != null) {
+        setState(() {
+          this.mySkiArea = skiArea;
+        });
+      }
     }
-
-    return skiAreaId;
   }
 
-  // Metodo asincrono che si occupa di ottenere la posizione iniziale.
-  Future<void> getCurrentLocation() async {
+  // Controlla se l'utente ha consentito l'accesso alla posizione GPS. Se non lo ha fatto, glielo chiede.
+  Future<void> checkForLocationPermission() async {
     bool serviceEnabled;
     LocationPermission permission;
 
@@ -58,7 +60,8 @@ class _MappaState extends State<Mappa> {
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
       // Servizio di localizzazione disabilitato!!
-      AppDialogs().openDialog(context, "Errore", "É consigliato l'uso della posizione GPS per poter usare al meglio l'app. Per poter conoscere la tua posizione in tempo reale nella mappa, abilita la posizione GPS.");
+      AppDialogs().openDialog(context, "Errore",
+          "É consigliato l'uso della posizione GPS per poter usare al meglio l'app. Per poter conoscere la tua posizione in tempo reale nella mappa, abilita la posizione GPS.");
       return;
     }
 
@@ -69,20 +72,32 @@ class _MappaState extends State<Mappa> {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
         // Permesso di localizzazione negato dall'utente!!!
-        AppDialogs().openDialog(context, "Errore", "Non è possibile ottenere la posizione in tempo reale dell'utente perchè ne è stato negato l'accesso.");
+        AppDialogs().openDialog(context, "Errore",
+            "Non è possibile ottenere la posizione in tempo reale dell'utente perchè ne è stato negato l'accesso.");
         return;
       }
     }
 
     if (permission == LocationPermission.deniedForever) {
       // Permesso di localizzazione negato permanentemente!!
-      AppDialogs().openDialog(context, "Errore", "Il servizio di posizione GPS non è in esecuzione. Non sarà possibile conoscere la tua posizione in tempo reale sulla mappa.");
+      AppDialogs().openDialog(context, "Errore",
+          "Il servizio di posizione GPS non è in esecuzione. Non sarà possibile conoscere la tua posizione in tempo reale sulla mappa.");
       return;
     }
 
+    // Ora che ho i permessi di farlo vado ad ottenere la posizione GPS
+    this.getCurrentGPSLocation();
+  }
+
+  // Ottiene la posizione dal GPS e imposta un marker che punta su di questa nella mappa
+  Future<Position> getCurrentGPSLocation() async {
     Position position = await Geolocator.getCurrentPosition();
+
     setState(() {
       currentPosition = position;
+
+      if (markers.isNotEmpty) markers.removeLast();
+
       markers.add(Marker(
         width: 40.0,
         height: 40.0,
@@ -96,43 +111,61 @@ class _MappaState extends State<Mappa> {
         ),
       ));
     });
+
+    return position;
   }
 
-  // Se è nota la posizione dell'utente, centro la mappa sulla sua posizione.
-  void centerMapOnPosition() {
-    if (currentPosition != null)
-      mapController.move(LatLng(currentPosition!.latitude, currentPosition!.longitude), 15.0);
+  // Ripete la richiesta di posizione GPS, e una volta ottenuta centra la mappa su di questa
+  Future<void> refreshPosition() async {
+    Position position = await getCurrentGPSLocation();
+    mapController.move(LatLng(position.latitude, position.longitude), 15.0);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: Color.fromRGBO(203, 235, 236, 1.0),
-
-        body: FlutterMap(
-          mapController: mapController,
-          options: MapOptions(
-            center: LatLng(46.3678, 10.6593), // Posizione di default (Pejo)
-            zoom: 13.0,
+        body: Visibility(
+          visible: this.mySkiArea != null,
+          replacement: Center(
+            child:
+                Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+              Image.asset(
+                'assets/images/waiting_map.png',
+                width: 125,
+              ),
+              SizedBox(height: 10),
+              Text(
+                "Passa nella scheda Info comprensorio per selezionare il comprensorio.",
+                style: TextStyle(
+                  fontSize: 17,
+                ),
+                textAlign: TextAlign.center,
+              )
+            ]),
           ),
-          children: [
-            TileLayer(
-                urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                userAgentPackageName: 'it.omarfederico.skitracker'
+          child: FlutterMap(
+            mapController: mapController,
+            options: MapOptions(
+              center: LatLng(this.mySkiArea?.latitudine ?? 0.0,
+                  this.mySkiArea?.longitudine ?? 0.0),
+              zoom: 13.0,
             ),
-            MarkerLayer(
-              markers: markers,
-            )
-          ],
+            children: [
+              TileLayer(
+                  urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                  userAgentPackageName: 'it.omarfederico.skitracker'),
+              MarkerLayer(
+                markers: markers,
+              )
+            ],
+          ),
         ),
-
         floatingActionButton: FloatingActionButton(
           backgroundColor: Color.fromRGBO(161, 149, 200, 1.0),
-          tooltip: 'Increment',
-          onPressed: centerMapOnPosition,
+          tooltip: 'Aggiorna posizione',
+          onPressed: refreshPosition,
           child: const Icon(Icons.location_on, color: Colors.white),
-        )
-    );
+        ));
   }
-
 }

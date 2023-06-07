@@ -2,7 +2,6 @@ import 'package:SkiTracker/models/Comprensorio.dart';
 import 'package:SkiTracker/scelta_comprensorio.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher_string.dart';
-
 import 'database/DbHelper.dart';
 import 'models/Pista.dart';
 
@@ -17,20 +16,8 @@ class InfoPiste extends StatefulWidget {
 }
 
 class _InfoPisteState extends State<InfoPiste> {
+  // Comprensorio selezionato
   Comprensorio? mySkiArea = null;
-  int stato = 1;
-  int snowparkComprensorio = 0;
-  int pisteNotturneComprensorio = 0;
-
-  // Elenco delle piste
-  // List<Piste> piste = [];
-  List<Pista> piste = [
-    Pista("Pista1", "novice"),
-    Pista("Pista2", "easy"),
-    Pista("Pista3", "intermediate"),
-    Pista("Pista4", "advanced"),
-    Pista("Pista5", "novice"),
-  ];
 
   void initState() {
     super.initState();
@@ -42,8 +29,10 @@ class _InfoPisteState extends State<InfoPiste> {
 
     if (id != null) {
       final skiArea = await DbHelper().getDettagliComprensorio(id);
+      List<Pista> listaPiste = await DbHelper().getComprensorioPiste(id);
+      skiArea?.setPisteList(listaPiste);
 
-      if (this.mySkiArea != null) {
+      if (skiArea != null) {
         setState(() {
           this.mySkiArea = skiArea;
         });
@@ -59,22 +48,20 @@ class _InfoPisteState extends State<InfoPiste> {
         visible: this.mySkiArea != null,
         maintainState: false,
         replacement: Center(
-          child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Image.asset(
-                    'assets/images/select_skiarea.png',
-                    width: 300,
-                ),
-                SizedBox(height: 10),
-                Text(
-                    "Tocca il pulsante in basso a destra per selezionare il comprensorio.",
-                  style: TextStyle(
-                    fontSize: 17,
-                  ),
-                  textAlign: TextAlign.center,
-                )
-              ]),
+          child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+            Image.asset(
+              'assets/images/select_skiarea.png',
+              width: 300,
+            ),
+            SizedBox(height: 10),
+            Text(
+              "Tocca il pulsante in basso a destra per selezionare il comprensorio.",
+              style: TextStyle(
+                fontSize: 17,
+              ),
+              textAlign: TextAlign.center,
+            )
+          ]),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -87,21 +74,27 @@ class _InfoPisteState extends State<InfoPiste> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    this.mySkiArea?.nome ?? "N/A",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                      fontSize: 28,
+                  Expanded(
+                    child: Text(
+                      this.mySkiArea?.nome ?? "N/A",
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                        fontSize: 28,
+                      ),
                     ),
                   ),
                   Text(
-                    "Ok",
+                    this.mySkiArea?.aperto == 1 ? "Aperto" : "Chiuso",
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                       fontSize: 20,
-                      backgroundColor: stato == 1 ? Colors.green : Colors.red,
+                      backgroundColor: this.mySkiArea?.aperto == 1
+                          ? Colors.green
+                          : Colors.red,
                     ),
                   ),
                 ],
@@ -122,7 +115,7 @@ class _InfoPisteState extends State<InfoPiste> {
                     ),
                   ),
                   Text(
-                    this.mySkiArea != null ? this.mySkiArea?.numPiste as String : "N/A",
+                    this.mySkiArea?.numPiste.toString() ?? "N/A",
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.black,
@@ -147,7 +140,7 @@ class _InfoPisteState extends State<InfoPiste> {
                     ),
                   ),
                   Text(
-                    "10",
+                    this.mySkiArea?.numImpianti.toString() ?? "N/A",
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.black,
@@ -172,7 +165,7 @@ class _InfoPisteState extends State<InfoPiste> {
                     ),
                   ),
                   Text(
-                    "10 m s.l.m.",
+                    "${this.mySkiArea?.minAltitudine.toString()} m s.l.m.",
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.black,
@@ -197,7 +190,7 @@ class _InfoPisteState extends State<InfoPiste> {
                     ),
                   ),
                   Text(
-                    "10 m s.l.m.",
+                    "${this.mySkiArea?.maxAltitudine.toString()} m s.l.m.",
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.black,
@@ -223,9 +216,9 @@ class _InfoPisteState extends State<InfoPiste> {
                     ),
                   ),
                   GestureDetector(
-                    onTap: () => launchUrlString("pornhub.com"!),
+                    onTap: () => launchUrlString(this.mySkiArea!.website),
                     child: Text(
-                      "pornhub.com",
+                      this.mySkiArea?.website ?? "N/A",
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.blueAccent,
@@ -245,7 +238,7 @@ class _InfoPisteState extends State<InfoPiste> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Visibility(
-                    visible: snowparkComprensorio == 1,
+                    visible: this.mySkiArea?.snowpark == 1,
                     maintainSize: false,
                     child: Text(
                       "✅ Snowpark",
@@ -256,7 +249,7 @@ class _InfoPisteState extends State<InfoPiste> {
                     ),
                   ),
                   Visibility(
-                    visible: pisteNotturneComprensorio == 1,
+                    visible: this.mySkiArea?.pisteNotturne == 1,
                     maintainSize: false,
                     child: Text(
                       "✅ Piste notturne",
@@ -284,7 +277,7 @@ class _InfoPisteState extends State<InfoPiste> {
             ),
             Expanded(
               child: ListView.builder(
-                  itemCount: piste.length,
+                  itemCount: this.mySkiArea?.listaPiste.length,
                   itemBuilder: (context, index) {
                     return Padding(
                         padding: EdgeInsets.symmetric(
@@ -293,12 +286,19 @@ class _InfoPisteState extends State<InfoPiste> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
-                              piste[index].nome,
-                              style: TextStyle(fontSize: 20),
+                            Expanded(
+                              child: Text(
+                                this.mySkiArea!.listaPiste[index].nome,
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                                style: TextStyle(fontSize: 20),
+                              ),
                             ),
                             Text(
-                              piste[index].getDifficultyWithIndicator(),
+                              this
+                                  .mySkiArea!
+                                  .listaPiste[index]
+                                  .getDifficultyWithIndicator(),
                               style: TextStyle(fontSize: 20),
                             )
                           ],
@@ -310,6 +310,7 @@ class _InfoPisteState extends State<InfoPiste> {
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Color.fromRGBO(161, 149, 200, 1.0),
+        tooltip: "Cambia comprensorio",
         onPressed: () async {
           final result = await Navigator.push(
             context,
@@ -322,8 +323,8 @@ class _InfoPisteState extends State<InfoPiste> {
           // controllo se il widget scegliComprensorio ha chiesto di ricaricare questo
           // in seguito alla selezione di un comprensorio
           if (result != null) {
-            setState(() async {
-              this.mySkiArea = await DbHelper().getDettagliComprensorio(result);
+            setState(() {
+              this.mySkiArea = result;
             });
           }
         },
