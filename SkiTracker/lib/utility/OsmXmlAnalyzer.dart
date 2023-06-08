@@ -1,6 +1,10 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:xml/xml.dart' as xml;
 import '../models/Pista.dart';
 
+/*++++++++++++++++++++++++++++++++++ CLASSI PER DEFINIZIONE DEI DATI ++++++++++++++++++++++++++++++++++*/
 class OSMWayTag {
   late String k;
   late String v;
@@ -35,7 +39,10 @@ class OSMNode {
   }
 }
 
+/*+++++++++++++++++++++++++++++++++++++++++ CLASSE STESSA PER L'ANALISI DEL XML DI OPENSTREETMAP +++++++++++++++++++++++++++*/
 class OsmXmlAnalyzer {
+
+  // Ottiene gli elementi Way da un documento OSM XML.
   List<OSMWay> getWays(xml.XmlDocument document) {
     List<OSMWay> ways = [];
 
@@ -68,6 +75,25 @@ class OsmXmlAnalyzer {
     return ways;
   }
 
+  // Ottiene i Nodes che compongono i Ways di un documento OSM XML.
+  List<OSMNode> getNodes(xml.XmlDocument document) {
+    List<OSMNode> nodes = [];
+
+    var nodeNodes = document.findAllElements("node");
+    for (int i = 0; i < nodeNodes.length; i++) {
+      var nodeElement = nodeNodes.elementAt(i);
+
+      int nodeId = int.parse(nodeElement.getAttribute("id")!);
+      double nodeLat = double.parse(nodeElement.getAttribute("lat")!);
+      double nodeLong = double.parse(nodeElement.getAttribute("lon")!);
+
+      nodes.add(OSMNode(nodeId, nodeLat, nodeLong));
+    }
+
+    return nodes;
+  }
+
+  // Estrae da un documento OSM XML l'elenco di piste di un comprensorio.
   List<Pista> getPisteList(xml.XmlDocument document, int comprensorioId) {
     var ways = this.getWays(document);
     List<Pista> listaPiste = [];
@@ -94,6 +120,40 @@ class OsmXmlAnalyzer {
     return listaPiste;
   }
 
+  // Ottiene le Polylines che compongono le varie piste del comprensorio.
+  List<Polyline> getSkiAreaPolylines(xml.XmlDocument document) {
+    // ottengo i ways (le piste) e i nodes (i punti che le compongono)
+    List<OSMWay> ways = this.getWays(document);
+    List<OSMNode> nodes = this.getNodes(document);
+    List<Polyline> polylines = [];
+
+    // per ogni way, ottengo le coordinate dei suoi nodi, e per ognuno di questi creo un punto
+    for (OSMWay way in ways) {
+      List<LatLng> points = [];
+
+      for (var wayNodeId in way.nodesId) {
+        var node = this.findNodeById(nodes, wayNodeId);
+        points.add(LatLng(node.lat, node.long));
+      }
+
+      // NOTA: firstWhere, usato in getDifficultyFromWayTags solleva uno StateError nel caso l'elemento
+      // non venga trovato; quando arrivano ways senza tag Difficulty gestisco l'eccezione semplicemente non
+      // aggiungendo alcuna polyline.
+      try {
+        OSMWayTag difficultyTag = getDifficultyFromWayTags(way.tags);
+        Polyline polyline = Polyline(points: points,
+            color: this.getPolylineColor(difficultyTag.v),
+            strokeWidth: 3.5);
+
+        polylines.add(polyline);
+      } on StateError catch (_) {}
+    }
+
+    return polylines;
+  }
+
+  // Rimuove dalla lista di piste quelle che hanno lo stesso nome di altre. Se viene trovata una pista che ha lo stesso nome, quella inserita
+  // precedentemente viene sostituita con la nuova occorrenza.
   List<Pista> removeDuplicatePistas(List<Pista> originalList) {
     List<String> nomiUsati = [];
     List<Pista> output = [];
@@ -110,6 +170,34 @@ class OsmXmlAnalyzer {
           }
         }
       }
+    }
+
+    return output;
+  }
+
+  // Trova ed estrae un nodo che appartiene alla lista dei nodi.
+  OSMNode findNodeById(List<OSMNode> nodes, int nodeId) {
+    return nodes.firstWhere((element) => element.id == nodeId);
+  }
+
+  // va ad estrapolare il tag "Difficulty" tra i vari tag presenti per un Way.
+  OSMWayTag getDifficultyFromWayTags(List<OSMWayTag> wayTags) {
+    return wayTags.firstWhere((element) => element.k == "piste:difficulty");
+  }
+
+  // imposta il colore della polyline in base alla difficoltà
+  Color getPolylineColor(String diff) {
+    Color output = Colors.yellow;
+
+    switch(diff) {
+      case 'novice':
+        output = Colors.white; break;
+      case 'easy':
+        output = Colors.blue; break;
+      case 'intermediate':
+        output = Colors.red; break;
+      case 'advanced':
+        output = Colors.black; break;
     }
 
     return output;

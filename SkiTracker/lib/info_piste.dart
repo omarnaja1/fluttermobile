@@ -51,7 +51,7 @@ class _InfoPisteState extends State<InfoPiste> {
           child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
             Image.asset(
               'assets/images/select_skiarea.png',
-              width: 300,
+              width: 175,
             ),
             SizedBox(height: 10),
             Text(

@@ -1,7 +1,10 @@
+import 'package:SkiTracker/utility/OsmXmlAnalyzer.dart';
+import 'package:SkiTracker/utility/SkiAreaGetter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:xml/xml.dart' as xml;
 
 import 'database/DbHelper.dart';
 import 'dialogs.dart';
@@ -26,8 +29,9 @@ class Mappa extends StatefulWidget {
 class _MappaState extends State<Mappa> {
   MapController mapController = MapController();
   Position? currentPosition;
-  List<Marker> markers = [];
   Comprensorio? mySkiArea = null;
+  List<Marker> markers = [];
+  List<Polyline> polylines = [];
 
   // Inizializzo lo StatefulWidget, andando ad ottenere la posizione GPS iniziale.
   @override
@@ -47,8 +51,21 @@ class _MappaState extends State<Mappa> {
         setState(() {
           this.mySkiArea = skiArea;
         });
+
+        drawComprensorioPolylines();
       }
     }
+  }
+
+  Future<void> drawComprensorioPolylines() async {
+    // ottengo l'xml del comprensorio
+    xml.XmlDocument skiAreaXml = await SkiAreaGetter().getSkiAreaXML(this.mySkiArea!.latitudine, this.mySkiArea!.longitudine, this.mySkiArea!.zoom);
+    // ottengo la lista di polylines del comprensorio
+    List<Polyline> polylines = OsmXmlAnalyzer().getSkiAreaPolylines(skiAreaXml);
+    // le aggiungo alla lista
+    setState(() {
+      this.polylines = polylines;
+    });
   }
 
   // Controlla se l'utente ha consentito l'accesso alla posizione GPS. Se non lo ha fatto, glielo chiede.
@@ -157,6 +174,9 @@ class _MappaState extends State<Mappa> {
                   userAgentPackageName: 'it.omarfederico.skitracker'),
               MarkerLayer(
                 markers: markers,
+              ),
+              PolylineLayer(
+                polylines: this.polylines,
               )
             ],
           ),

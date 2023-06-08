@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:SkiTracker/about_us.dart';
 import 'package:SkiTracker/mappa.dart';
+import 'package:flutter/services.dart';
 import 'info_piste.dart';
 
-void main() {
-  runApp(const MyApp());
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+  ]);
+  runApp(new MyApp());
 }
 
 class MyApp extends StatelessWidget {
