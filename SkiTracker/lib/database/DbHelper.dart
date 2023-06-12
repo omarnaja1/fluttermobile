@@ -117,4 +117,16 @@ class DbHelper {
     database.close();
     return pistaList;
   }
+
+  // Aggiorna il valore dello zoom per un Comprensorio
+  Future<void> updateComprensorioZoom(int idComprensorio, int zoom) async {
+    // apro il db
+    Database database = await openDB();
+
+    // Aggiorno il valore dello zoom
+    await database.update('Comprensorio', {'zoom': zoom}, where: 'id = ?', whereArgs: [idComprensorio]);
+
+    // chiudo il db
+    database.close();
+  }
 }

@@ -31,7 +31,24 @@ class Comprensorio {
         map['snowpark'], map['pisteNotturne'], map['lat'], map['long'], map['maxAltitudine'], map['minAltitudine'], map['zoom']);
   }
 
+  // imposta la lista di piste
   void setPisteList(List<Pista> list) {
     this.listaPiste = list;
+  }
+
+  // riduce lo zoom, ritornando il nuovo zoom
+  int decreaseZoom() {
+    if (this.zoom > 1)
+      this.zoom--;
+
+    return this.zoom;
+  }
+
+  // aumenta lo zoom, ritornando il nuovo zoom
+  int increaseZoom() {
+    if (this.zoom < 18)
+      this.zoom++;
+
+    return this.zoom;
   }
 }

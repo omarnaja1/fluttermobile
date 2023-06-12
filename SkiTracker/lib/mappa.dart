@@ -1,5 +1,6 @@
 import 'package:SkiTracker/utility/OsmXmlAnalyzer.dart';
 import 'package:SkiTracker/utility/SkiAreaGetter.dart';
+import 'package:SkiTracker/utility/ZoomRegulationDialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
@@ -138,6 +139,34 @@ class _MappaState extends State<Mappa> {
     mapController.move(LatLng(position.latitude, position.longitude), 15.0);
   }
 
+  // Metodo per la regolazione dello zoom della mappa.
+  void zoomRegulation() {
+    // uso la funzione showDialog per aprire un AlertDialog personalizzato creato ad-hoc
+    showDialog<int>(context: context,
+      builder: (BuildContext context) {
+        return ZoomRegulationDialog();
+      },
+    ).then((selectedValue) {
+      // ho ricevuto il valore selezionato nel Dialog
+      if (selectedValue != null && this.mySkiArea != null) {
+        int? newZoom;
+
+        if (selectedValue == 0) {
+          // l'utente non vede alcune piste, diminuisco lo zoom
+          newZoom = this.mySkiArea?.decreaseZoom();
+        } else if (selectedValue == 1) {
+          // l'utente vede troppe piste, aumento lo zoom
+          newZoom = this.mySkiArea?.increaseZoom();
+        }
+
+        // salvo il nuovo zoom sul database e aggiorno la mappa
+        DbHelper().updateComprensorioZoom(this.mySkiArea!.id, newZoom!);
+        drawComprensorioPolylines();
+        print("NUOVO ZOOM ---> $newZoom");
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -181,11 +210,25 @@ class _MappaState extends State<Mappa> {
             ],
           ),
         ),
-        floatingActionButton: FloatingActionButton(
-          backgroundColor: Color.fromRGBO(161, 149, 200, 1.0),
-          tooltip: 'Aggiorna posizione',
-          onPressed: refreshPosition,
-          child: const Icon(Icons.location_on, color: Colors.white),
-        ));
+        floatingActionButton: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            FloatingActionButton(
+              backgroundColor: Color.fromRGBO(44, 124, 163, 1.0),
+              tooltip: 'Regolazione zoom mappa',
+              onPressed: zoomRegulation,
+              child: const Icon(Icons.zoom_in_map_outlined, color: Colors.white),
+            ),
+            SizedBox(height: 25),
+            FloatingActionButton(
+              backgroundColor: Color.fromRGBO(161, 149, 200, 1.0),
+              tooltip: 'Aggiorna posizione',
+              onPressed: refreshPosition,
+              child: const Icon(Icons.location_on, color: Colors.white),
+            ),
+            SizedBox(height: 10,)
+          ],
+        )
+    );
   }
 }
